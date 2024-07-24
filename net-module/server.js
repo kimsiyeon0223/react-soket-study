@@ -20,8 +20,8 @@ server.on("error", (err) => {
 });
 
 //6 : 5000번 포트를 열고 기다립니다.
-server.listen(5000, () => {
-  console.log("listening on 5000");
+server.listen(5002, () => {
+  console.log("listening on 5002");
 });
 
 // net 모듈
