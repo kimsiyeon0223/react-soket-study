@@ -1,36 +1,26 @@
-// 1
-const WebSocket = require("ws");
+//1
+const { Server } = require("socket.io");
 
-// 2
-const wss = new WebSocket.Server({ port: 5000 });
+//2
+const io = new Server("5000", {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
 
-// 3
-wss.on("connection", (ws) => {
-  // 4
-  const broadCastHandler = (msg) => {
-    wss.clients.forEach(function each(client, i) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(msg);
-      }
-    });
-  };
-
-  // 5
-  ws.on("message", (res) => {
-    const { type, data, id } = JSON.parse(res);
-    switch (type) {
-      case "id":
-        broadCastHandler(JSON.stringify({ type: "welcome", data: data }));
-        break;
-      case "msg":
-        broadCastHandler(JSON.stringify({ type: "other", data: data, id: id }));
-        break;
-      default:
-        break;
-    }
+//3
+io.sockets.on("connection", (socket) => {
+  //4
+  socket.on("message", (data) => {
+    //5
+    io.sockets.emit("sMessage", data);
+  });
+  socket.on("login", (data) => {
+    io.sockets.emit("sLogin", data);
   });
 
-  ws.on("close", () => {
-    console.log("client has disconnected");
+  //6
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
   });
 });
