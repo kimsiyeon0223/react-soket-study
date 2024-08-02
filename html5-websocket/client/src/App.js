@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./App.css";
 import logo from "./images/websocket.png";
+import { io } from "socket.io-client";
 
 // 1
 const webSocket = new WebSocket("ws://localhost:3000");
@@ -12,29 +13,50 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
   const [msg, setMsg] = useState("");
   const [msgList, setMsgList] = useState([]);
+
+  //11
+  const [privateTarget, setPrivateTarget] = useState("");
   // 3
   useEffect(() => {
     if (!webSocket) return;
-    webSocket.onopen = function () {
-      console.log("open", webSocket.protocol);
-    };
-    // 4
-    //어떠한 이벤트로 WebSocket 연결과 동시에 onmessage 함수를 사용해서 발생하는 문제이다.
-    webSocket.onmessage = function (e) {
-      const { data, id, type } = JSON.parse(e.data);
+    function sMessageCallback(msg) {
+      //12
+      const { data, id, target } = msg;
       setMsgList((prev) => [
         ...prev,
         {
-          msg: type === "welcome" ? `${data} joins the chat` : data,
-          type: type,
+          msg: data,
+          //13
+          type: target ? "private" : "other",
           id: id,
         },
       ]);
-    };
-    webSocket.onclose = function () {
-      console.log("close");
+    }
+    // 4
+    //어떠한 이벤트로 WebSocket 연결과 동시에 onmessage 함수를 사용해서 발생하는 문제이다.
+    webSocket.on("sMessage", sMessageCallback);
+    return () => {
+      webSocket.off("sMessage", sMessageCallback);
     };
   }, []);
+
+  useEffect(() => {
+    if (!webSocket) return;
+    function sLoginCallback(msg) {
+      setMsgList((prev) => [
+        ...prev,
+        {
+          msg: `${msg} joins the chat`,
+          type: "welcome",
+          id: "",
+        },
+      ]);
+    }
+    webSocket.on("sLogin", sLoginCallback);
+    return () => {
+      webSocket.off("sLogin", sLoginCallback);
+    };
+  });
   // 5
   useEffect(() => {
     scrollToBottom();
@@ -60,18 +82,25 @@ function App() {
   // 8
   const onSendSubmitHandler = (e) => {
     e.preventDefault();
+    //14
     const sendData = {
-      type: "msg",
       data: msg,
       id: userId,
+      target: privateTarget,
     };
-    webSocket.send(JSON.stringify(sendData));
+    webSocket.emit("message", sendData);
     setMsgList((prev) => [...prev, { msg: msg, type: "me", id: userId }]);
     setMsg("");
   };
   // 9
   const onChangeMsgHandler = (e) => {
     setMsg(e.target.value);
+  };
+
+  //15
+  const onSetPrivateTarget = (e) => {
+    const { id } = e.target.dataset;
+    setPrivateTarget((prev) => (prev === id ? "" : id));
   };
   return (
     <div className="app-container">
@@ -89,15 +118,34 @@ function App() {
                     <div className="line" />
                   </li>
                 ) : (
-                  <li className={v.type} key={`${i}_li`}>
-                    <div className="userId">{v.id}</div>
-                    <div className={v.type}>{v.msg}</div>
+                  <li
+                    className={v.type}
+                    key={`${i}_li`}
+                    name={v.id}
+                    data-i={v.id}
+                    onClick={onSetPrivateTarget}
+                  >
+                    <div
+                      className={
+                        v.id === privateTarget ? "private-user" : "userId"
+                      }
+                      data-id={v.id}
+                      name={v.id}
+                    >
+                      {v.id}
+                    </div>
+                    <div className={v.type} data-id={v.id} name={v.id}>
+                      {v.msg}
+                    </div>
                   </li>
                 ),
               )}
               <li ref={messagesEndRef} />
             </ul>
             <form className="send-form" onSubmit={onSendSubmitHandler}>
+              {privateTarget && (
+                <div className="private-target">{privateTarget}</div>
+              )}
               <input
                 placeholder="Enter your message"
                 onChange={onChangeMsgHandler}
