@@ -19,6 +19,7 @@ function App() {
       console.log("open", webSocket.protocol);
     };
     // 4
+    //어떠한 이벤트로 WebSocket 연결과 동시에 onmessage 함수를 사용해서 발생하는 문제이다.
     webSocket.onmessage = function (e) {
       const { data, id, type } = JSON.parse(e.data);
       setMsgList((prev) => [
