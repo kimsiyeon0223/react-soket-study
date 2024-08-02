@@ -13,6 +13,8 @@ const io = new Server("5000", {
 });
 
 //11
+// 잡속한 사용자 아이디를 저장하기 위한 Map 객체를 생성했습니다.
+// clinets 객체는 누구에게 메시지를 보낼지 검색하는 임시 사용자 데이터베이스라고 생각하면 됩니다.
 const clients = new Map();
 
 //3 : io.socket.on()의 conntection 이벤트를 이용해 연결된 부분을 확인합니다.
@@ -24,6 +26,11 @@ io.sockets.on("connection", (socket) => {
   socket.on("message", (res) => {
     const { target } = res;
     //12
+    // 12~13
+    // 13번의 clients 객체에 데이터를 저장하는 부분을 확인할 수 있다.
+    // socket.io에서는 기보넞ㄱ으로 연결된 소켓의 고유 번호인 socket.id라는 값을 가지고 있다. socket.id 값은 무작위 값으로 각각의 연결될 소켓을 구분한다. 이 값을 클라이언트에서 보내온 아이디 값과 매칭해서 clients 객체에 저장한다.
+    // 12번은 clients 객체에서 검색된 socket.id값을 이용해서 특정한 사용자에게 보내는 로직입니다.
+    // io.socket.to()함수를 이용해 privat한 매시지를 전송할 수 있습니다. 만약 target 정보가 없다면 일반적인 broadcast를 실행합니다.
     const toUser = clients.get(target);
     target
       ? io.sockets.to(toUser).emit("sMessage", res)
