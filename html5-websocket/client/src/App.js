@@ -3,7 +3,7 @@ import "./App.css";
 import logo from "./images/websocket.png";
 
 // 1
-const webSocket = new WebSocket("ws://localhost:5000");
+const webSocket = new WebSocket("ws://localhost:3000");
 
 function App() {
   // 2
