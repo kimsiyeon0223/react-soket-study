@@ -14,6 +14,10 @@
   gap: 5px;
 }
 
+.app-container>.wrap>.login-box>.login-title>img {
+  border-radius: 50%;
+}
+
 .app-container>.wrap>.login-box>.login-form {
   display: flex;
   gap: 10px;
@@ -53,6 +57,13 @@
 
 .app-container>.wrap>.chat-box .chat li.other {
   text-align: right;
+  cursor: pointer;
+}
+
+.app-container>.wrap>.chat-box .chat li.private {
+  text-align: right;
+  color: red;
+  cursor: pointer;
 }
 
 .app-container>.wrap>.chat-box .chat li.welcome {
@@ -89,15 +100,33 @@
   color: #fff;
 }
 
+.app-container>.wrap>.chat-box .chat div.private {
+  padding: 5px;
+  display: inline-block;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-color: #000;
+  color: #fff;
+}
+
 .app-container>.wrap>.chat-box .chat .userId {
   margin-top: 5px;
   font-size: 13px;
   font-weight: bold;
 }
 
+.app-container>.wrap>.chat-box .chat .private-user {
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: bold;
+  color: red;
+}
+
 .app-container>.wrap>.chat-box .send-form {
   margin-top: 10px;
   display: flex;
+  align-items: center;
   gap: 10px;
 }
 
@@ -114,4 +143,11 @@
   padding: 10px;
   border-radius: 5px;
   background-color: #00d8ff;
+}
+
+.app-container>.wrap>.chat-box .send-form .private-target {
+  border: 0;
+  padding: 5px;
+  color: green;
+  font-weight: bold;
 }
