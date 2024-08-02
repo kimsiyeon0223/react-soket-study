@@ -4,7 +4,7 @@ import logo from "./images/websocket.png";
 import { io } from "socket.io-client";
 
 // 1
-const webSocket = new WebSocket("ws://localhost:3000");
+const webSocket = io("http://localhost:3000");
 
 function App() {
   // 2
@@ -14,19 +14,19 @@ function App() {
   const [msg, setMsg] = useState("");
   const [msgList, setMsgList] = useState([]);
 
-  //11
+  //11 : 1대1 대화 상대를 지목하고 저장할 수 있는 변수가 필요합니다. 그래서 privateTarget이라는 변수를 생성해서 클릭한 아이디의 값을 저장합니다.
   const [privateTarget, setPrivateTarget] = useState("");
   // 3
   useEffect(() => {
     if (!webSocket) return;
     function sMessageCallback(msg) {
-      //12
+      //12 : 서버에서 받는 데이터 중 target이라는 값이 있다면 'private'라는 스타일을 적용하고, 없다면 기존에 'other'이라는 스타일을 적용합니다.
       const { data, id, target } = msg;
       setMsgList((prev) => [
         ...prev,
         {
           msg: data,
-          //13
+          //13 : 메시지를 보낼 때 privateTarget에 저장된 아이디 값을 함께 전송합니다.
           type: target ? "private" : "other",
           id: id,
         },
@@ -82,7 +82,7 @@ function App() {
   // 8
   const onSendSubmitHandler = (e) => {
     e.preventDefault();
-    //14
+    //14 : 아이디를 클릭했을 때 privateTarget 변수에 아이디를 저장하는 함수입니다.
     const sendData = {
       data: msg,
       id: userId,
