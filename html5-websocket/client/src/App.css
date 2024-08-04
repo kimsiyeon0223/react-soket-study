@@ -24,6 +24,11 @@
   margin-top: 20px;
 }
 
+.app-container>.wrap>.login-box>.login-form select {
+  border: 0;
+  cursor: pointer;
+}
+
 .app-container>.wrap>.login-box>.login-form input {
   width: 100%;
   border: 0;
