@@ -16,6 +16,8 @@ function App() {
 
   //11 : 1대1 대화 상대를 지목하고 저장할 수 있는 변수가 필요합니다. 그래서 privateTarget이라는 변수를 생성해서 클릭한 아이디의 값을 저장합니다.
   const [privateTarget, setPrivateTarget] = useState("");
+  //21 : 선택한 방 번호를 저장하기 위한 변수 설정입니다.
+  const [roomNumber, serRoomNumber] = useState("1");
   // 3
   useEffect(() => {
     if (!webSocket) return;
@@ -66,13 +68,10 @@ function App() {
   };
 
   // 6
+  //22 : 로그인 버튼을 클릭할 때 실행됩니다. 기존에는 사용자 아이디만 전송했다면 이번에는 사용자가 속한 방 번호를 같이 정송합니다.
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    const sendData = {
-      type: "id",
-      data: userId,
-    };
-    webSocket.send(JSON.stringify(sendData));
+    webSocket.emit("login", { userId: userId, roomNumber: roomNumber });
     setIsLogin(true);
   };
   // 7
@@ -101,6 +100,11 @@ function App() {
   const onSetPrivateTarget = (e) => {
     const { id } = e.target.dataset;
     setPrivateTarget((prev) => (prev === id ? "" : id));
+  };
+
+  //23 : 방 번호를 선택했을 때 실행되는 함수입니다.
+  const onRoomChangeHandler = (e) => {
+    serRoomNumber(e.target.value);
   };
   return (
     <div className="app-container">
@@ -161,6 +165,10 @@ function App() {
               <div>WebChat</div>
             </div>
             <form className="login-form" onSubmit={onSubmitHandler}>
+              <select onChange={onRoomChangeHandler}>
+                <option value="1">Room 1</option>
+                <option value="2">Room 2</option>
+              </select>
               <input
                 placeholder="Enter your ID"
                 onChange={onChangeUserIdHandler}
